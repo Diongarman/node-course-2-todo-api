@@ -39,8 +39,8 @@ app.get('/todos/:id', (req, res) => {
         //404 - send back empty send
 
     if (!ObjectId.isValid(userId)) {
-        console.log('allah hu akbar');
-        return res.status(400).send()
+        console.log('invalid ID!');
+        return res.status(404).send()
     }
 
     // findById
@@ -51,6 +51,7 @@ app.get('/todos/:id', (req, res) => {
 
     Todo.findById(userId).then((todo) => {
         if (!todo) {
+            console.log('Id not found but valid');
             return res.status(404).send();
         } 
         // good to return todo on an object, {todo}, so down the line have flexibility to customise 
