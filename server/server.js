@@ -52,7 +52,7 @@ app.get('/todos/:id', (req, res) => {
 
     Todo.findById(userId).then((todo) => {
         if (!todo) {
-            console.log('Id not found but valid');
+            console.log('Id is valid but dne');
             return res.status(404).send();
         } 
         // good to return todo on an object, {todo}, so down the line have flexibility to customise 
@@ -66,6 +66,26 @@ app.get('/todos/:id', (req, res) => {
 
   
 });
+
+// DELETE /todos/{id}
+
+app.delete('/todos/:id', (req, res) => {
+    var Id = req.params.id;
+
+    if (!ObjectId.isValid(Id)) {
+        return res.status(404).send()
+    }
+
+    Todo.findByIdAndRemove(Id).then((todo) => {
+        if (!todo) {
+            return res.status(404).send();
+        } 
+        
+        res.send({todo})
+    
+    }).catch((e) => res.status(400).send());
+
+})
 
 app.listen(port, () => {
     console.log(`started up at port: ${port}`);
