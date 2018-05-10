@@ -84,8 +84,7 @@ app.delete('/todos/:id', (req, res) => {
         res.send({todo})
     
     }).catch((e) => res.status(400).send());
-
-})
+});
 
 app.listen(port, () => {
     console.log(`started up at port: ${port}`);
