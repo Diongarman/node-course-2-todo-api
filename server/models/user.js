@@ -46,6 +46,17 @@ UserSchema.methods.toJSON = function () {
 };
 
 
+UserSchema.methods.removeToken = function (token) {
+    var user = this;
+
+    return user.update({
+        $pull: {
+            //pull from tokens array
+            tokens: {token} //removes object with this property
+        }
+    });
+};
+
 //Instance methods
 UserSchema.methods.generateAuthToken = function () {
     var user = this;
