@@ -5,6 +5,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectId} = require('mongodb');
 var jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 
 var {mongoose} = require('./db/mongoose');
@@ -150,6 +151,28 @@ app.post('/users', (req, res) => {
 app.get('/users/me', authenticate, (req, res) => {
     res.send(req.user);
 });
+
+
+// POST /users/login {email, password}
+
+app.post('/users/login', (req, res) => {
+    var body = _.pick(req.body, ['email', 'password']);
+
+
+
+    User.findByCredentials(body.email, body.password).then((user) => {
+        // create token
+        
+        return user.generateAuthToken().then((token) => {
+            res.header('x-auth', token).send(user);
+        });
+    }).catch((e) => {
+        res.status(400).send();
+    });
+
+
+});
+
 
 app.listen(port, () => {
     console.log(`started up at port: ${port}`);
