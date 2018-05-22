@@ -12,6 +12,67 @@ const jwt = require('jsonwebtoken');
 beforeEach(populateUsers);
 beforeEach(populateTodos);
 
+
+
+describe('POST /users/login', () => {
+    it('should log in a user successfully', (done) => {
+        var email = users[0].email;
+        var password = users[0].password;
+        console.log(password);
+        request(app)
+            .post('/users/login')
+            .send({email, password})
+            .expect(200)
+            .expect((res) => {
+                expect(res.headers['x-auth']).toExist();
+
+            })
+            .end((err, res) => {
+
+                if (err) {
+                    return done(err);
+                }
+                
+                User.findById(users[0]._id).then((user) => {
+
+                    expect(user.tokens[0]).toInclude({
+                        access: 'auth',
+                        token: res.headers['x-auth']
+                    });
+                    done();
+                }).catch((e) => done(e));     
+            });
+    });
+
+    it('should return a 400', (done) => {
+        var email = users[1].email;
+        var password = 'incorrect password';
+        request(app)
+            .post('/users/login')
+            .send({email, password})
+            .expect(400)
+            .expect((res) => {
+                expect(res.headers['x-auth']).toNotExist();
+
+            })
+            .end((err, res) => {
+
+                if (err) {
+                    return done(err);
+                }
+                
+                User.findById(users[1]._id).then((user) => {
+
+
+                    expect(user.tokens.length).toBe(0);
+                    done();
+                }).catch((e) => done(e));     
+            });
+
+    });
+});
+
+
 describe('POST /users', () => {
     it('should create a user', (done) => {
         var email = 'josie@helper.com';
