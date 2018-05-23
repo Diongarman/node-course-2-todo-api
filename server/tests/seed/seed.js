@@ -20,27 +20,33 @@ const users = [{
 }, {
     _id: userTwoId,
     email: 'tom@gmail.com',
-    password: 'userTwoPass'
+    password: 'userTwoPass',
+    tokens: [{
+        access: 'auth',
+        token: jwt.sign({_id: userTwoId, access: 'auth'}, 'abc123').toString()
+    }]
 }];
+
+
+// todo seeds
+const todos = [{
+    _id: new ObjectId(),
+    text: 'First todo',
+    _creator: userOneId
+},{
+    _id: new ObjectId(),
+    text: 'Second todo',
+    completed: true,
+    completedAt: 333,
+    _creator: userTwoId
+}];
+
 
 const populateTodos = (done) => {
     Todo.remove({}).then(() => {
         return Todo.insertMany(todos);
     }).then(() => done());
 };
-
-
-// todo seeds
-const todos = [{
-    _id: new ObjectId(),
-    text: 'First todo'
-},{
-    _id: new ObjectId(),
-    text: 'Second todo',
-    completed: true,
-    completedAt: 333
-}];
-
 
 const populateUsers = (done) => {
     User.remove({}).then(() => {

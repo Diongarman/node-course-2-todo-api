@@ -5,8 +5,6 @@ const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 
 
-
-
 var UserSchema = new mongoose.Schema({
     email: {
         type: String,
@@ -45,7 +43,6 @@ UserSchema.methods.toJSON = function () {
     return _.pick(userObject, ['_id', 'email']);
 };
 
-
 UserSchema.methods.removeToken = function (token) {
     var user = this;
 
@@ -57,7 +54,6 @@ UserSchema.methods.removeToken = function (token) {
     });
 };
 
-//Instance methods
 UserSchema.methods.generateAuthToken = function () {
     var user = this;
     var access = 'auth';
@@ -70,7 +66,6 @@ UserSchema.methods.generateAuthToken = function () {
     });
 };
 
-//Model methods
 UserSchema.statics.findByToken = function (token) {
     var User = this;
     var decoded;

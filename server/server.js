@@ -19,11 +19,11 @@ const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
-// POST /todos
 
-app.post('/todos', (req, res) => {
+app.post('/todos', authenticate,(req, res) => {
     var todo = new Todo({
-        text: req.body.text
+        text: req.body.text,
+        _creator: req.user._id
     });
 
     todo.save().then((doc) => {
@@ -33,34 +33,34 @@ app.post('/todos', (req, res) => {
     });
 });
 
+app.get('/todos', authenticate,(req, res) => {
 
-app.get('/todos', (req, res) => {
-    Todo.find().then((todos)=> {
+    
+
+    Todo.find({
+        _creator: req.user._id
+    }).then((todos)=> {
         res.send({todos});
     }, (e) => {
         res.status(400).send(e);
     });
 });
 
-// GET /todos/{id}
 
-app.get('/todos/:id', (req, res) => {
+app.get('/todos/:id', authenticate,(req, res) => {
     var userId = req.params.id;
-    // valid id using isValid
-        //404 - send back empty send
+
 
     if (!ObjectId.isValid(userId)) {
         console.log('invalid ID!');
         return res.status(404).send()
     }
 
-    // findById
-     //success case
-        // if todo - send it back
-        // if no todo - send back 404 with empty body
 
-
-    Todo.findById(userId).then((todo) => {
+    Todo.findOne({
+        _id: userId,
+        _creator: req.user._id
+    }).then((todo) => {
         if (!todo) {
             console.log('Id is valid but dne');
             return res.status(404).send();
@@ -77,16 +77,17 @@ app.get('/todos/:id', (req, res) => {
   
 });
 
-// DELETE /todos/{id}
-
-app.delete('/todos/:id', (req, res) => {
+app.delete('/todos/:id', authenticate, (req, res) => {
     var Id = req.params.id;
 
     if (!ObjectId.isValid(Id)) {
         return res.status(404).send()
     }
 
-    Todo.findByIdAndRemove(Id).then((todo) => {
+    Todo.findOneAndRemove({
+        _id: Id,
+        _creator: req.user._id
+    }).then((todo) => {
         if (!todo) {
             return res.status(404).send();
         } 
@@ -96,8 +97,7 @@ app.delete('/todos/:id', (req, res) => {
     }).catch((e) => res.status(400).send());
 });
 
-
-app.patch('/todos/:id', (req, res) => {
+app.patch('/todos/:id', authenticate,(req, res) => {
     var Id = req.params.id;
 
     //_pick gives us a subset of things user passed
@@ -117,7 +117,10 @@ app.patch('/todos/:id', (req, res) => {
     }
 
 
-    Todo.findByIdAndUpdate(Id, {$set: body}, {new: true}).then((todo) => {
+    Todo.findOneAndUpdate({
+        _id: Id,
+        _creator: req.user._id
+    }, {$set: body}, {new: true}).then((todo) => {
         if (!todo) {
             return res.status(404).send();
         }
@@ -130,8 +133,6 @@ app.patch('/todos/:id', (req, res) => {
 
 });
 
-
-// POST /users
 app.post('/users', (req, res) => {
 
     var body = _.pick(req.body, ['email', 'password']);
@@ -146,8 +147,6 @@ app.post('/users', (req, res) => {
     });
 });
 
-
-
 app.get('/users/me', authenticate, (req, res) => {
     res.send(req.user);
 });
@@ -157,8 +156,6 @@ app.get('/users/me', authenticate, (req, res) => {
 
 app.post('/users/login', (req, res) => {
     var body = _.pick(req.body, ['email', 'password']);
-
-
 
     User.findByCredentials(body.email, body.password).then((user) => {
         // create token
@@ -172,7 +169,6 @@ app.post('/users/login', (req, res) => {
 
 
 });
-
 
 app.delete('/users/me/token', authenticate, (req, res) => {
     req.user.removeToken(req.token).then(() => {
