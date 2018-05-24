@@ -4,8 +4,6 @@ const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 
-const config = require('./../config/config.json');
-
 var UserSchema = new mongoose.Schema({
     email: {
         type: String,
