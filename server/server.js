@@ -46,7 +46,6 @@ app.get('/todos', authenticate,(req, res) => {
     });
 });
 
-
 app.get('/todos/:id', authenticate,(req, res) => {
     var userId = req.params.id;
 
@@ -151,9 +150,6 @@ app.get('/users/me', authenticate, (req, res) => {
     res.send(req.user);
 });
 
-
-// POST /users/login {email, password}
-
 app.post('/users/login', (req, res) => {
     var body = _.pick(req.body, ['email', 'password']);
 
@@ -177,6 +173,7 @@ app.delete('/users/me/token', authenticate, (req, res) => {
         res.status(400).send();
     })
 });
+
 
 
 app.listen(port, () => {
