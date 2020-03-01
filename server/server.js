@@ -7,11 +7,6 @@ const { ObjectId } = require('mongodb');
 var jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-var cors = require('cors');
-
-//test
-app.use(cors({ origin: true, credentials: true }));
-
 var { mongoose } = require('./db/mongoose');
 var { Todo } = require('./models/todo');
 var { User } = require('./models/user');
