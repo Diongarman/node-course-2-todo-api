@@ -7,6 +7,10 @@ const { ObjectId } = require('mongodb');
 var jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
+var cors = require('cors');
+
+app.options('*', cors());
+
 var { mongoose } = require('./db/mongoose');
 var { Todo } = require('./models/todo');
 var { User } = require('./models/user');
